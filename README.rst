@@ -39,6 +39,9 @@ common
 ------
 Useful VCL snippets for most occasions.
 
+device_detect.vcl
+  helper function - detect device from user agent
+
 backend_default.vcl
   default backend definition
 

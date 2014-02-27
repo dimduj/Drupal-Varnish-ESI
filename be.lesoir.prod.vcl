@@ -41,6 +41,9 @@ include "custom/lesoir/config/acl_purge.vcl";
 ## remove cache-blocking headers from backend response
 include "common/sub_remove_cacheblock_beresp.vcl";
 
+## Detect device
+include "common/device_detect.vcl";
+
 ## common snippets
 
 ## PURGE requests
