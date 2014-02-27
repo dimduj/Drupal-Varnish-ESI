@@ -27,7 +27,8 @@ import std;
 ## edit node configuration in config/*
 
 ## backends
-include "custom/lesoir/config/backend.vcl";
+include "custom/lesoir/config/backend_prod_F5.vcl";
+#include "custom/lesoir/config/backend_prod_RR.vcl";
 
 ## ACLs
 include "custom/lesoir/config/acl_httpsproxy.vcl";
