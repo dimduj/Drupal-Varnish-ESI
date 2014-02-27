@@ -117,6 +117,7 @@ include "experimental/saintmode.vcl";
 
 
 ## custom code here
+include "custom/lesoir/redirect.vcl";
 
 
 sub vcl_recv {

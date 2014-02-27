@@ -116,6 +116,8 @@ include "experimental/grace.vcl";
 include "experimental/saintmode.vcl";
 
 ## custom code here
+include "custom/sudinfo/redirect.vcl";
+
 
 sub vcl_recv {
 # uncomment to bypass return(pipe);
