@@ -30,6 +30,10 @@ acl_purge.vcl
 backend.vcl
   backend definitions
 
+custom
+------
+Custom VCL for customers 
+
 
 common
 ------
@@ -49,6 +53,9 @@ cookie_remove_cloudflare.vcl
 
 error_restart.vcl
   restart request on error 503 (backend unavailable)
+
+method_allowed.vcl
+  restrict method to GET, HEAD or POST 
 
 extcache_ignorebusy.vcl
   ignore busy objects to avoid stall in cache meshes
