@@ -27,13 +27,13 @@ import std;
 ## edit node configuration in config/*
 
 ## backends
-include "vlan/config/backend.vcl";
+include "custom/vlan/config/backend.vcl";
 
 ## ACLs
-include "vlan/config/acl_httpsproxy.vcl";
-#include "vlan/config/acl_extcache.vcl";
-#include "vlan/config/acl_freshforce.vcl";
-include "vlan/config/acl_purge.vcl";
+include "custom/vlan/config/acl_httpsproxy.vcl";
+#include "custom/vlan/config/acl_extcache.vcl";
+#include "custom/vlan/config/acl_freshforce.vcl";
+include "custom/vlan/config/acl_purge.vcl";
 
 
 ## helper functions
@@ -113,7 +113,7 @@ include "experimental/saintmode.vcl";
 
 ## custom code here
 
-include "vlan/proxy.vcl"; 
+include "custom/vlan/proxy.vcl"; 
 
 sub vcl_recv {
 # uncomment to bypass return(pipe);
@@ -121,12 +121,12 @@ sub vcl_recv {
 
 
 ## custom error pages to replace Guru Meditation
-#include "vlan/errorpages/errorpage_200_inline.vcl";
-include "vlan/errorpages/errorpage_403_inline.vcl";
-#include "vlan/errorpages/errorpage_503_inline.vcl";
-include "vlan/errorpages/errorpage_404.vcl";
+#include "custom/vlan/errorpages/errorpage_200_inline.vcl";
+include "custom/vlan/errorpages/errorpage_403_inline.vcl";
+#include "custom/vlan/errorpages/errorpage_503_inline.vcl";
+include "custom/vlan/errorpages/errorpage_404.vcl";
 ## default errorpage must come last in vcl_error()
-include "vlan/errorpages/errorpage_default_inline.vcl";
+include "custom/vlan/errorpages/errorpage_default_inline.vcl";
 ## don't include errorpages/ beyond this point
 
 
