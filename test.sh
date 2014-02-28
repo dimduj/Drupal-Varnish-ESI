@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Try to compile all vcl files in /custom - Stop on error.
+#
 ORIG_PWD=`pwd`
 cd custom
 for config_vcl in *.vcl; do
