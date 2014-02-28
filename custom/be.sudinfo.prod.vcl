@@ -41,6 +41,9 @@ include "custom/sudinfo/config/backend_prod_F5.vcl";
 ## remove cache-blocking headers from backend response
 include "common/sub_remove_cacheblock_beresp.vcl";
 
+## Restart on 503 - DO NOT USE with drupal ESI per ROLE/USER/...
+include "common/error_restart.vcl";
+
 ## Detect device
 #include "common/device_detect.vcl";
 

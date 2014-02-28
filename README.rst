@@ -6,13 +6,14 @@ Collection of VCL code
 
 `Wiki documentation <https://github.com/lampeh/varnish-vcl/wiki>`_
 
-
 standard.vcl
   configuration root. copy or symlink to default.vcl
 
+test.sh
+  Simple test script. Try to compile all vcl files in  /custom directory
 
-config
-------
+config (samples)
+----------------
 Node-specific ACLs and backend definitions.
 
 acl_extcache.vcl

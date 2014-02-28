@@ -46,6 +46,9 @@ include "common/device_detect.vcl";
 
 ## common snippets
 
+## Restart on 503 - DO NOT USE with drupal ESI per ROLE/USER/...
+include "common/error_restart.vcl";
+
 ## PURGE requests
 ## for ban lurker support, use purge_noreq instead of purge.vcl
 #include "common/purge.vcl";
