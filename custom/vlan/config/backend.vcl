@@ -1,12 +1,11 @@
 backend default {
-	.host = "10.2.4.36";
+	.host = "activation-stage.vlan.be";
 	.port = "8083";
 	.max_connections = 200;
 }
 
 backend portalvlan {
-#	.host = "portal.vlan.be";
-        .host = "185.18.10.87";
+	.host = "portal.vlan.be";
 	.port = "80";
 	.max_connections = 200;
 }
