@@ -5,12 +5,11 @@
 ORIG_PWD=`pwd`
 cd custom
 for config_vcl in *.vcl; do
-	varnishd -n /tmp -C -pvcl_dir=$ORIG_PWD -f "${ORIG_PWD}/custom/${config_vcl}" >/dev/null 2>&1
-	ERROR=$?
-	if [ $ERROR -eq 0 ] ; then
+	ERRORS_LINE=`(varnishd -n /tmp -C -pvcl_dir=$ORIG_PWD -f "${ORIG_PWD}/custom/${config_vcl}" 3>&1 1>&2 2>&3 3>&- 1>/dev/null) | wc -l`
+	if [ $ERRORS_LINE -lt 3 ] ; then
 		echo -e "\e[00;32m$config_vcl [ OK ]\e[00m";
 	else 
-		echo -e "\e[00;31m$config_vcl [ Error ] $ERROR\e[00m";
+		echo -e "\e[00;31m$config_vcl [ Error ] $ERRORS_LINE \e[00m";
 		varnishd -n /tmp -C -pvcl_dir=$ORIG_PWD -f "${ORIG_PWD}/custom/${config_vcl}";
-	fi;	
+	fi;
 done;
