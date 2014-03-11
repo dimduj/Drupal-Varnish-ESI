@@ -115,6 +115,9 @@ include "common/ttl_jitter.vcl";
 include "experimental/grace.vcl";
 include "experimental/saintmode.vcl";
 
+## Varnish-ping for loadbalancers
+include "common/ping.vcl";
+
 
 ## custom code here
 
