@@ -61,6 +61,9 @@ error_restart.vcl
 method_allowed.vcl
   restrict method to GET, HEAD or POST 
 
+ping.vcl
+  auto response http - 200 for varnish-ping url. Used for loadbalancers.
+
 extcache_ignorebusy.vcl
   ignore busy objects to avoid stall in cache meshes
 
