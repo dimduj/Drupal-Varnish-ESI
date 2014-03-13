@@ -27,8 +27,7 @@ import std;
 ## edit node configuration in config/*
 
 ## backends
-include "custom/vlan/config/backend.vcl";
-
+include "custom/vlan/config/backend_stage_RR.vcl";
 ## ACLs
 include "custom/vlan/config/acl_httpsproxy.vcl";
 #include "custom/vlan/config/acl_extcache.vcl";
