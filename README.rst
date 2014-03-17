@@ -112,6 +112,11 @@ no_w00t.vcl
 sub_remove_cacheblock_beresp.vcl
   remove cache-blocking headers from backend response
 
+common/drupal
+--------------
+forbidden_url_d6.vcl
+  specific forbidden d6 and d7 uri loike /admin /devel ...
+
 
 errorpages
 ----------
