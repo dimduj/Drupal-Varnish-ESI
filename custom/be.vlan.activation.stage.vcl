@@ -280,6 +280,9 @@ sub vcl_deliver {
     remove resp.http.X-Varnish;
     remove resp.http.Via;
     remove resp.http.Server;
+    remove resp.http.X-Drupal-Cache;
+    remove resp.http.X-Generator;
+
     if (req.url !~ "(?i)\.(png|gif|jpeg|jpg|ico|swf|css|js|html|htm|txt|zip|svg|xml)/?(\?.*)?$") {
 		remove resp.http.ETag;
     }
