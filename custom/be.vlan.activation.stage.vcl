@@ -134,6 +134,7 @@ include "common/drupal/forbidden_url_d7.vcl";
 ## --------------------------------------------------------------------
 
 include "custom/vlan/forbidden_url.vcl";
+include "custom/vlan/redirect.vcl";
 
 sub vcl_recv {
 
