@@ -329,7 +329,7 @@ vcl_error {
 
 		<script type="text/javascript">
 		  var _gaq = _gaq || [];
-		  _gaq.push(['_setAccount', 'UA-150849-1']);
+		  _gaq.push(['_setAccount', 'UA-47356246-1']);
 		  _gaq.push(['_trackPageview',"\/503"]);
 		  (function() {
 			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
