@@ -143,7 +143,7 @@ sub vcl_recv {
     }
 
 	## No cache for public editing pages
-	if (req.url ~"/e/?(\?.*)?$") {
+	if (req.url ~ "(?i)^e/?(\?.*)?$") {
         return (pass);
 	}
 
