@@ -112,6 +112,10 @@ no_w00t.vcl
 sub_remove_cacheblock_beresp.vcl
   remove cache-blocking headers from backend response
 
+x_forwarded_for.vcl
+  add x-forwared for proxy mode  
+
+
 common/drupal
 --------------
 forbidden_url_d6.vcl
