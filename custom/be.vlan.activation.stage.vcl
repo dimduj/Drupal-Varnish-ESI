@@ -132,6 +132,9 @@ include "common/drupal/forbidden_url_d7.vcl";
 ## Below is a copy of the default VCL logic.
 ## The built-in logic will be appended to your code.
 ## --------------------------------------------------------------------
+
+include "custom/vlan/forbidden_url.vcl";
+
 sub vcl_recv {
 
     ## We only deal with GET and HEAD by default
