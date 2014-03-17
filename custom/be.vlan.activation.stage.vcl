@@ -137,15 +137,20 @@ include "custom/vlan/forbidden_url.vcl";
 
 sub vcl_recv {
 
-    ## We only deal with GET and HEAD by default
-    if (req.request != "GET" && req.request != "HEAD") {
-        return (pass);
-    }
+   ## We only deal with GET and HEAD by default
+   if (req.request != "GET" && req.request != "HEAD") {
+		return (pass);
+   }
 
-	## No cache for public editing pages
-	if (req.url ~ "(?i)^/e/(.*)?$") {
-        return (pass);
-	}
+   ## No cache for public editing pages
+   if (req.url ~ "(?i)^/e/(.*)?$") {
+		return (pass);
+   }
+
+   ## Force Refresh if referer is "/e/xxxx" (public edition.
+   if (req.http.referer && req.http.referer ~ "(?i)/e/(.*)?$") {
+		set req.hash_always_miss = true;
+   }
 
    ## Gestion du temps de grace
    ## Temps pendant lequel on continue à servir le contenu
