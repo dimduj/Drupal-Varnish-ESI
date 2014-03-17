@@ -2,17 +2,17 @@
 # return 302 or 301 redirect from VCL
 # 
 # Usage:
-#  error 750 "https://www.example.com/";
+#  error 752 "https://www.example.com/";
 # or
 #  set req.http.location = "https://www.example.com" req.url;
-#  error 750 req.http.location;
+#  error 752 req.http.location;
 #
 # Use error 751 for permanent redirect with code 301
 ##
 
 sub vcl_error {
 	# redirect from vcl. new location is in obj.response
-	if (obj.status == 750 || obj.status == 751 ) {
+	if (obj.status == 751 || obj.status == 752 ) {
 		set obj.http.Location = obj.response;
 		if (obj.status == 751) {
 			set obj.status = 301;
