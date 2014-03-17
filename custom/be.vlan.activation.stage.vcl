@@ -298,7 +298,7 @@ sub vcl_deliver {
 #include "custom/vlan/errorpages/errorpage_default_inline.vcl";
 ## don't include errorpages/ beyond this point
 
-vcl_error {
+sub vcl_error {
     set obj.http.Content-Type = "text/html; charset=utf-8";
     set obj.http.Retry-After = "5";
   synthetic {"
