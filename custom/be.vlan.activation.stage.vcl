@@ -142,6 +142,11 @@ sub vcl_recv {
         return (pass);
     }
 
+	## No cache for public editing pages
+	if (req.url ~"/e/?(\?.*)?$") {
+        return (pass);
+	}
+
    ## Gestion du temps de grace
    ## Temps pendant lequel on continue à servir le contenu
    ## en cache même s'il est périmé.
