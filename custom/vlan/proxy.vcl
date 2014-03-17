@@ -1,7 +1,7 @@
 sub vcl_recv {
 
 
-	if ( req.host ~ "(?i)^activation(.*)\.vlan\.be && req.url == "/" ) {
+	if ( req.host ~ "(?i)^activation(.*)\.vlan\.be" && req.url == "/" ) {
 		set req.backend = default;
 	} else {
 		## Choix du Backend
