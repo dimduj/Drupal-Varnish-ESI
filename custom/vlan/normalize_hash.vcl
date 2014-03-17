@@ -6,7 +6,7 @@ sub vcl_hash {
 	  # c'est EMPIRIQUE ... faut donc compter sur l'expérience et la communication
 	  # avec les équipes de dev. 
 
-	  if(req.request == "GET" && !req.url ~ "(?i)/(e|api|ad)/(\?.*)?$" {
+	  if(req.request == "GET" && !req.url ~ "(?i)/(e|api|ad)/(\?.*)?$") {
 
 		set req.http.X-Sanitized-URL = req.url;
 
