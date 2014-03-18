@@ -224,20 +224,20 @@ sub vcl_fetch {
     call remove_cacheblock_beresp;
 
 	## TTL et temps de grace par defaut  
-	set beresp.ttl = 15m;
-	set beresp.grace = 30m;
+	set beresp.ttl = 1h;
+	set beresp.grace = 2h;
 
 	## Pour les fichiers, on augmente volontiers le temps de mise en cache
 	if (req.url ~ "^/sites/default/files/" || req.url ~ "(?i)\.(png|gif|jpe?g|ico|txt|swf|css|js|pdf|zip|wav|avi|svg)/?(\?.*)?") {
 		unset beresp.http.set-cookie;
-		set beresp.ttl = 1h;
-		set beresp.grace = 2h;
+		set beresp.ttl = 6h;
+		set beresp.grace = 24h;
 	}
 
 	## On gere en fonction des status HTTP retournés
 	if (beresp.status == 404) {
 		unset beresp.http.set-cookie; 
-		set beresp.ttl = 30m; 
+		set beresp.ttl = 12h; 
 		return(deliver);
 	}
 	elsif(beresp.status == 301){
@@ -247,9 +247,9 @@ sub vcl_fetch {
 	}
 	elsif (beresp.status >= 500) { 
 		if (req.url ~ "(?i)\.(png|gif|jpeg|jpg|ico|swf|css|js|pdf|zip|wav|avi)/?(\?.*)?$") { 
-			set beresp.saintmode = 2h;
+			set beresp.saintmode = 24h;
 		} else { 
-		  set beresp.saintmode = 15m; 
+		  set beresp.saintmode = 2h; 
 		} 
 		return(restart); 
 	} 
