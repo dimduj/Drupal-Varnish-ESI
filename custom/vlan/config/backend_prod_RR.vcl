@@ -21,7 +21,7 @@ backend bapaactp01
         .probe = actsprobe;
 }
 
-backend bapaacts02
+backend bapaactp02
 {
         .host = "bapaactp02.rossel.be";
         .port = "8083";
@@ -34,10 +34,10 @@ backend bapaacts02
 
 director default round-robin {
         {
-                .backend = bapaacts01;
+                .backend = bapaactp01;
         }
         {
-                .backend = bapaacts02;
+                .backend = bapaactp02;
         }
 }
 
