@@ -8,7 +8,7 @@ sub vcl_recv {
 		if (
 			req.url == "/" ||
 			req.url ~  "(?i)^/metriweb/" || 
-			req.url ~ "(?i)^/(fr|nl|en)(/|$)" ||
+			req.url ~ "(?i)^/(fr|nl|en|integration)(/|$)" ||
 			req.url ~ "(?i)^/(css|js|images|shadowbox|scripts)(/|$)" 
 		   ) {
 			set req.backend = portalvlan;
