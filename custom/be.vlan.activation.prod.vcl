@@ -154,10 +154,10 @@ sub vcl_recv {
    }
 
    ## No cache for pages starting with /vlan-immo/
-   if (req.url ~ "(?i)^/vlan-immo/(.*)?$") {
-		set req.backend = portalvlan;
-		set req.hash_always_miss = true;
-		return (pass);
+   if (req.url ~ "(?i)^/vlan-immo/") {
+                set req.backend = portalvlan;
+                set req.hash_always_miss = true;
+                return (pass);
    }
 
    ## Gestion du temps de grace
