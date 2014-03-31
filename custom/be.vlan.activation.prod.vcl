@@ -153,6 +153,12 @@ sub vcl_recv {
 		set req.hash_always_miss = true;
    }
 
+   ## No cache for pages starting with /vlan-immo/
+   if (req.url ~ "(?i)^/vlan-immo/(.*)?$") {
+		set req.hash_always_miss = true;
+		return (pass);
+   }
+
    ## Gestion du temps de grace
    ## Temps pendant lequel on continue à servir le contenu
    ## en cache même s'il est périmé.
