@@ -17,7 +17,7 @@ sub vcl_recv {
 
 	## Special Url Alias (home page).
 	if (req.url ~ "(?i)^/acheter-malin\.html$") {
-		req.url = "/";
+		set req.url = "/";
 		set req.backend = default;
 	}
 
