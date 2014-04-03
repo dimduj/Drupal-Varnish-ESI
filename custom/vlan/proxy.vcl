@@ -18,6 +18,7 @@ sub vcl_recv {
 	## Special Url Alias (home page).
 	if (req.url ~ "(?i)^/acheter-malin\.html$") {
 		set req.url = "/";
+		set req.http.host = "activation.vlan.be";
 		set req.backend = default;
 	}
 
