@@ -10,6 +10,11 @@
 # Use error 751 for permanent redirect with code 301
 ##
 
+
+# Truc custom d'Audaxis
+#Varnish sait pas faire de redirction on a implementé ca:
+# on déclare deux nouveau statut custom
+
 sub vcl_error {
 	# redirect from vcl. new location is in obj.response
 	if (obj.status == 751 || obj.status == 752 ) {
@@ -22,6 +27,8 @@ sub vcl_error {
 			set obj.response = "Moved Temporarily";
 		}
 		set obj.http.Content-Type = "text/html; charset=utf-8";
+		
+		#Retry-after => dit combien de fois le client doit ré-essayer 
 		unset obj.http.Retry-After;
 		if (req.request != "HEAD") {
 			synthetic {"<!doctype html>

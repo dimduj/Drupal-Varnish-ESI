@@ -6,6 +6,7 @@
 # beresp.saintmode to be Varnish will serve the object, even if it is stale.
 ##
 
+#saint mode ttl=60S only... change that
 sub vcl_fetch {
 	if (beresp.status == 500 && req.restarts < 4) {
 		std.log("vcl_fetch(): Status 500 - restart with saintmode");

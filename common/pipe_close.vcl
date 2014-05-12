@@ -2,6 +2,8 @@
 # add "Connection: close" to piped requests
 ##
 
+# WE FORCE CLOSE OF PIPE
+
 sub vcl_pipe {
 	# Note that only the first request to the backend will have
 	# X-Forwarded-For set.  If you use X-Forwarded-For and want to

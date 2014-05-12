@@ -8,6 +8,9 @@
 # requires ACL purge
 ##
 
+# WHAT THE HELL ? WHY this fetch ?
+# we use variable in receive that will be set after in the  fetch ??? 
+
 sub vcl_fetch {
 	set beresp.http.X-Purge-URL = req.url;
 	set beresp.http.X-Purge-Host = req.http.host;
@@ -23,6 +26,8 @@ sub vcl_recv {
 		if (!client.ip ~ purge) {
 			error 405 "Not allowed.";
 		}
+		# obj.http.X-Purge-Host => on fait la requete par rapoort au host varnish (on purge pas tout les user/1 de tte les instances)
+		# On prefere la commande ban à la commande purge
 		ban("obj.http.X-Purge-URL ~ " + req.url + " && obj.http.X-Purge-Host ~ " + req.http.host);
 		error 200 "Added to ban list";
 	}

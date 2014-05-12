@@ -9,6 +9,7 @@ sub vcl_fetch {
 			# use only Cache-Control: for static files
 			remove beresp.http.Expires;
 
+			#usefull for proxy in amount of varnish
 			# ensure "public" tag. backend should set "private" if necessary
 			if (beresp.http.Cache-Control !~ "public" && beresp.http.Cache-Control !~ "private") {
 				set beresp.http.Cache-Control = beresp.http.Cache-Control + ",public";
