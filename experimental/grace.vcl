@@ -18,5 +18,5 @@ sub vcl_recv {
 sub vcl_fetch {
 	# keep old objects in cache for 1h after expiry
 	# allows use of grace in vcl_recv()
-	set beresp.grace = 1h;
+	set beresp.grace = 30m;
 }

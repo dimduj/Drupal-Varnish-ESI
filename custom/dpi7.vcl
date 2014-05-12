@@ -19,22 +19,21 @@ import std;
 ## backends
 ## --------------------------------------------------------------------
 
-include "custom/vlan/config/backend_prod_RR.vcl";
+include "custom/dpi7/config/backend_prod_RR.vcl";
 ## ACLs
-include "custom/vlan/config/acl_httpsproxy.vcl";
-#include "custom/vlan/config/acl_extcache.vcl";
-#include "custom/vlan/config/acl_freshforce.vcl";
-include "custom/vlan/config/acl_purge.vcl";
+# Definit un enssemble d'adresse IP pour authoriser des actions (purge, ban, GET)
+include "custom/dpi7/config/acl_httpsproxy.vcl";
+#include "custom/dpi7/config/acl_extcache.vcl";
+#include "custom/dpi7/config/acl_freshforce.vcl";
+include "custom/dpi7/config/acl_purge.vcl";
 
 ## --------------------------------------------------------------------
 ## helper functions
 ## --------------------------------------------------------------------
 
-## remove cache-blocking headers from backend response
+## load sub routine "remove_cacheblock_beresp" to remove cache-blocking headers from backend response
 include "common/sub_remove_cacheblock_beresp.vcl";
 
-## Restart on 503 - DO NOT USE with drupal ESI per ROLE/USER/...
-include "common/error_restart.vcl";
 
 ## Detect device
 #include "common/device_detect.vcl";
@@ -44,7 +43,9 @@ include "common/error_restart.vcl";
 ## --------------------------------------------------------------------
 
 ## PURGE requests
-## for ban lurker support, use purge_noreq instead of purge.vcl
+## purge.vcl is simple purge with VCL.
+## purge_noreq.vcl is a friendly ban-lurker implementation of purge
+## prefer purge_noreq.vcl
 #include "common/purge.vcl";
 include "common/purge_noreq.vcl";
 
@@ -52,6 +53,7 @@ include "common/purge_noreq.vcl";
 include "common/no_w00t.vcl";
 
 ## force a cache miss if the client sets an "X-FreshForce: yes" header
+#WARNING check your ACL before activate this feature
 #include "common/freshforce_header.vcl";
 
 ## force a cache miss if the client address matches the freshforce acl
@@ -66,11 +68,15 @@ include "common/pipe_close.vcl";
 ## return 302 or 301 redirect from VCL
 include "common/redirect.vcl";
 
-## restart the request on backend error
+## Restart on 503 - 
+# si on recoit une 503 on reessaye trois fois de plus (nbre de round robin +1) avant de reelement renvoyer 503 au client
+#@todo: check compatibility with drupal ESI per ROLE/USER/... since ESI aslo do restart ? check)
 include "common/error_restart.vcl";
 
+
 ## repair weird request format "GET http://host/path"
-include "common/normalize_http.vcl";
+#@todo: Remove temporary cause issue with ESI ? => seems not ... :/
+#include "common/normalize_http.vcl";
 
 ## allow "HTTPS:" header from SSL proxies only
 include "common/http_https.vcl";
@@ -94,7 +100,7 @@ include "common/cookie_remove_ga.vcl";
 include "common/expire_remove_static.vcl";
 
 ## advertise ESI, handle ESI responses
-#include "common/esi.vcl";
+include "common/esi.vcl";
 
 ## set object TTL from Cache-Control: v-maxage attribute
 include "common/ttl_v-maxage.vcl";
@@ -113,19 +119,29 @@ include "common/method_allowed.vcl";
 include "experimental/grace.vcl";
 include "experimental/saintmode.vcl";
 
-## Varnish-ping for loadbalancers
+## Varnish-ping for loadbalancers above varnish (F5)
 include "common/ping.vcl";
 
 ## X Forwarded For (proxy)
+# We bind client adress IP
 include "common/x_forwarded_for.vcl";
 
 ## --------------------------------------------------------------------
-## custom code here
+## custom code here for Drupal 7
 ## --------------------------------------------------------------------
-include "custom/vlan/proxy.vcl"; 
 
 ## Drupal Common : Forbidden Files
 include "common/drupal/forbidden_url_d7.vcl";
+
+## --------------------------------------------------------------------
+## custom code here for your Drupal 7 website
+## --------------------------------------------------------------------
+
+
+#include "custom/dpi7/proxy.vcl"; 
+#include "custom/dpi7/forbidden_url.vcl";
+#include "custom/dpi7/redirect.vcl";
+include "custom/dpi7/dpi7-esi.vcl";
 
 
 ## --------------------------------------------------------------------
@@ -133,40 +149,30 @@ include "common/drupal/forbidden_url_d7.vcl";
 ## The built-in logic will be appended to your code.
 ## --------------------------------------------------------------------
 
-include "custom/vlan/forbidden_url.vcl";
-include "custom/vlan/redirect.vcl";
-
 sub vcl_recv {
+
+
+
 
    ## We only deal with GET and HEAD by default
    if (req.request != "GET" && req.request != "HEAD") {
-		return (pass);
+   #pass= pour cette requete, on outrepasse la cache. ! on est déjà passer par common/method_allowed.vcl
+   #@todo: remove POST request from dorce close pipe
+   #
+		return (pipe);
    }
 
-   ## No cache for public editing pages
-   if (req.url ~ "(?i)^/e/(.*)?$") {
-		return (pass);
-   }
-
-   ## Force Refresh if referer is "/e/xxxx" (public edition.
-   if (req.http.referer && req.http.referer ~ "(?i)/e/(.*)?$") {
-		set req.hash_always_miss = true;
-   }
-
-   ## No cache for pages starting with /vlan-immo/
-   if (req.url ~ "(?i)^/vlan-immo/") {
-                set req.backend = portalvlan;
-                set req.hash_always_miss = true;
-                return (pass);
-   }
-
+   
    ## Gestion du temps de grace
    ## Temps pendant lequel on continue à servir le contenu
    ## en cache même s'il est périmé.
+   #redondant avec les experimental/grace.vcl
+   #pas tres logique ... :/ pcq pas la page mais les images :/
    set req.grace = 6m;
    if (req.request == "GET" && req.url ~ "(?i)\.(png|gif|jpeg|jpg|ico|swf|css|js|html|htm|txt|zip|svg|xml)/?(\?.*)?$") { 
 		set req.grace = 2h;
    } 
+   
 
    ## Retrait des lignes de l'entete http inutiles.
    if (req.request == "GET" && req.url !~ "(?i)\.(png|gif|jpeg|jpg|ico|swf|css|js|html|htm|txt|zip|svg|xml)/?(\?.*)?$") {
@@ -202,7 +208,7 @@ sub vcl_pass {
 ##  
 ## --------------------------------------------------------------------
 
-include "custom/vlan/normalize_hash.vcl";
+include "custom/dpi7/normalize_hash.vcl";
 
 sub vcl_hash {
     return (hash);
@@ -211,6 +217,7 @@ sub vcl_hash {
 ## --------------------------------------------------------------------
 ## 
 ## --------------------------------------------------------------------
+#We do that to obtain it on the delivery ...
 sub vcl_hit {
 	set req.http.X-CacheTtl = obj.ttl; 
     return (deliver);
@@ -228,6 +235,10 @@ sub vcl_miss {
 ## --------------------------------------------------------------------
 sub vcl_fetch {
 
+
+    ///@todo: do only esi for php page not static ressource
+    set beresp.do_esi = true;
+
     call remove_cacheblock_beresp;
 
 	## TTL et temps de grace par defaut  
@@ -243,6 +254,7 @@ sub vcl_fetch {
 
 	## On gere en fonction des status HTTP retournés
 	if (beresp.status == 404) {
+	#WARNING NEVER pass cokkie unless you will log someone else ;)
 		unset beresp.http.set-cookie; 
 		set beresp.ttl = 12h; 
 		return(deliver);
@@ -253,21 +265,33 @@ sub vcl_fetch {
 		return(deliver);
 	}
 	elsif (beresp.status >= 500) { 
+	
 		if (req.url ~ "(?i)\.(png|gif|jpeg|jpg|ico|swf|css|js|pdf|zip|wav|avi)/?(\?.*)?$") { 
 			set beresp.saintmode = 24h;
 		} else { 
 		  set beresp.saintmode = 2h; 
 		} 
+    	#@todo: maybe we should strip cookies ?
 		return(restart); 
 	} 
 	elsif (beresp.status >= 300 ) { 
+	#http://stackoverflow.com/questions/12691489/varnish-hit-for-pass-means
+	#hit for cache allow parallel execution in the backend instead of serial execution from varnish to the backend
 		return(hit_for_pass);
 	}
 
 	## gestion des cookies (pages spécifiques).
-    if (req.url ~ "^/user"  || req.url ~ "^/logout"){
+	# on renvoit les cookies sur les pages d'authentification et de logout .
+	# si autre page d'aut il faut la mettre ici ... pour le reste le visiteur a pas besoin de recevoir les cookies en retour ...il les a dans son client
+	# @todo: attention poll
+	#@todo: esi ...
+    #@todo: d'apres mooi pas besoin renvoyer cookies pour dpicache_Esi_profile_info.php
+    #if (req.url ~ "^/user"  || req.url ~ "^/logout"){
+    if (req.url ~ "^/user"  || req.url ~ "^/logout"|| req.url ~ "^/dpicache_esi_profile_info.php"){
     # Ici, on laisse les cookies 
     } else {
+    
+    
 		unset beresp.http.set-cookie;
     }
   
@@ -278,7 +302,7 @@ sub vcl_fetch {
 ## 
 ## --------------------------------------------------------------------
 
-include "custom/vlan/cache_control.vcl";
+include "custom/dpi7/cache_control.vcl";
 
 sub vcl_deliver {
 
@@ -291,7 +315,6 @@ sub vcl_deliver {
 	} else { 
 		set resp.http.X-Cache = "MISS_" + server.hostname; 
 	}
-    set resp.http.X-hash = req.http.X-CacheHash;
 
 
     # Retrait des lignes de l'entete http inutiles.
@@ -301,9 +324,14 @@ sub vcl_deliver {
     remove resp.http.X-Drupal-Cache;
     remove resp.http.X-Generator;
 
+
+	#todo set Etag to the TTL so a user will never do two hit on the same ressource
     if (req.url !~ "(?i)\.(png|gif|jpeg|jpg|ico|swf|css|js|html|htm|txt|zip|svg|xml)/?(\?.*)?$") {
 		remove resp.http.ETag;
     }
+    
+    set resp.http.X-hash = req.http.X-CacheHash;
+
 
 
     return (deliver);
@@ -313,13 +341,13 @@ sub vcl_deliver {
 ## --------------------------------------------------------------------
 ## custom error pages to replace Guru Meditation
 ## --------------------------------------------------------------------
-#include "custom/vlan/errorpages/errorpage_200_inline.vcl";
-#include "custom/vlan/errorpages/errorpage_403_inline.vcl";
-#include "custom/vlan/errorpages/errorpage_503_inline.vcl";
-#include "custom/vlan/errorpages/errorpage_404.vcl";
+#include "custom/dpi7/errorpages/errorpage_200_inline.vcl";
+#include "custom/dpi7/errorpages/errorpage_403_inline.vcl";
+#include "custom/dpi7/errorpages/errorpage_503_inline.vcl";
+#include "custom/dpi7/errorpages/errorpage_404.vcl";
 
 ## default errorpage must come last in vcl_error()
-#include "custom/vlan/errorpages/errorpage_default_inline.vcl";
+#include "custom/dpi7/errorpages/errorpage_default_inline.vcl";
 ## don't include errorpages/ beyond this point
 
 sub vcl_error {
@@ -331,7 +359,7 @@ sub vcl_error {
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
   <html>
     <head>
-      <title>VLAN.BE - erreur "} + obj.status + " " + obj.response + {" </title>
+      <title>dpi7.BE - erreur "} + obj.status + " " + obj.response + {" </title>
       <style type='text/css'>
         body {
           color:#2A2A2A;
@@ -373,12 +401,4 @@ sub vcl_error {
   </html>
   "};
   return (deliver);
-}
-
-sub vcl_init {
-	return (ok);
-}
-
-sub vcl_fini {
-	return (ok);
 }
