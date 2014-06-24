@@ -15,17 +15,18 @@ import std;
 ## variable support vmod - https://github.com/varnish/libvmod-var
 #import var;
 
+
+
 ## --------------------------------------------------------------------
-## backends
+## ACLS
 ## --------------------------------------------------------------------
 
-include "custom/dpi7/config/backend_prod_RR.vcl";
-## ACLs
-# Definit un enssemble d'adresse IP pour authoriser des actions (purge, ban, GET)
-include "custom/dpi7/config/acl_httpsproxy.vcl";
-#include "custom/dpi7/config/acl_extcache.vcl";
-#include "custom/dpi7/config/acl_freshforce.vcl";
-include "custom/dpi7/config/acl_purge.vcl";
+# Define a set of rules (regarding Ip adresse etc) to allow actions (purge, ban, GET)
+
+include "default-conf/dpi7/acl/acl_httpsproxy.vcl";
+#include "default-conf/dpi7/acl/acl_extcache.vcl";
+#include "default-conf/dpi7/acl/acl_freshforce.vcl";
+include "default-conf/dpi7/acl/acl_purge.vcl";
 
 ## --------------------------------------------------------------------
 ## helper functions
@@ -131,17 +132,15 @@ include "common/x_forwarded_for.vcl";
 ## --------------------------------------------------------------------
 
 ## Drupal Common : Forbidden Files
-include "common/drupal/forbidden_url_d7.vcl";
+include "drupal/forbidden_url_d7.vcl";
 
 ## --------------------------------------------------------------------
 ## custom code here for your Drupal 7 website
 ## --------------------------------------------------------------------
 
 
-#include "custom/dpi7/proxy.vcl"; 
-#include "custom/dpi7/forbidden_url.vcl";
-#include "custom/dpi7/redirect.vcl";
-include "custom/dpi7/dpi7-esi.vcl";
+#include "default-conf/dpi7/proxy/proxy.vcl"; 
+include "default-conf/dpi7/esi/dpi7-esi.vcl";
 
 
 ## --------------------------------------------------------------------
@@ -208,7 +207,7 @@ sub vcl_pass {
 ##  
 ## --------------------------------------------------------------------
 
-include "custom/dpi7/normalize_hash.vcl";
+include "default-conf/dpi7/hashing_strategy.vcl";
 
 sub vcl_hash {
     return (hash);
@@ -302,7 +301,7 @@ sub vcl_fetch {
 ## 
 ## --------------------------------------------------------------------
 
-include "custom/dpi7/cache_control.vcl";
+include "default-conf/dpi7/cache_control/static_file_cache_control.vcl";
 
 sub vcl_deliver {
 
@@ -341,13 +340,13 @@ sub vcl_deliver {
 ## --------------------------------------------------------------------
 ## custom error pages to replace Guru Meditation
 ## --------------------------------------------------------------------
-#include "custom/dpi7/errorpages/errorpage_200_inline.vcl";
-#include "custom/dpi7/errorpages/errorpage_403_inline.vcl";
-#include "custom/dpi7/errorpages/errorpage_503_inline.vcl";
-#include "custom/dpi7/errorpages/errorpage_404.vcl";
+#include "default-conf/dpi/errorpages/errorpage_200_inline.vcl";
+#include "default-conf/dpi/errorpages/errorpage_403_inline.vcl";
+#include "default-conf/dpi/errorpages/errorpage_503_inline.vcl";
+#include "default-conf/dpi/errorpages/errorpage_404.vcl";
 
 ## default errorpage must come last in vcl_error()
-#include "custom/dpi7/errorpages/errorpage_default_inline.vcl";
+#include "default-conf/dpi/errorpages/errorpage_default_inline.vcl";
 ## don't include errorpages/ beyond this point
 
 sub vcl_error {

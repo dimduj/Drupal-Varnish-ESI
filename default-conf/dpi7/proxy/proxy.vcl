@@ -1,3 +1,6 @@
+## Proxy illustration
+#
+/*
 sub vcl_recv {
 
 	if ( req.http.host ~ "(?i)^special-crafted-url(.*)\.a-host\.be") {
@@ -23,3 +26,4 @@ sub vcl_recv {
 	}
 
 }
+*/
