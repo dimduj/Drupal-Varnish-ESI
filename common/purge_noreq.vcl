@@ -8,7 +8,7 @@
 # requires ACL purge
 ##
 
-# WHAT THE HELL ? WHY this fetch ?
+# @todo:  WHAT THE HELL ? WHY this fetch ?
 # we use variable in receive that will be set after in the  fetch ??? 
 
 sub vcl_fetch {

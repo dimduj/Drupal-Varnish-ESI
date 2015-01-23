@@ -34,8 +34,6 @@ sub vcl_hash {
 
 
 	  #@todo: rename or remove req.http.X-CacheHash . It appear to be useless
-	  
-	  
 	  hash_data(req.http.host);
 	  
 	  #@todo: dont need this anymore since we do that on deliver of dpi7.vcl

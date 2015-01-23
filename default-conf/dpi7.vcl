@@ -16,7 +16,6 @@ import std;
 #import var;
 
 
-
 ## --------------------------------------------------------------------
 ## ACLS
 ## --------------------------------------------------------------------
@@ -73,7 +72,6 @@ include "common/redirect.vcl";
 # si on recoit une 503 on reessaye trois fois de plus (nbre de round robin +1) avant de reelement renvoyer 503 au client
 #@todo: check compatibility with drupal ESI per ROLE/USER/... since ESI aslo do restart ? check)
 include "common/error_restart.vcl";
-
 
 ## repair weird request format "GET http://host/path"
 #@todo: Remove temporary cause issue with ESI ? => seems not ... :/
@@ -139,9 +137,12 @@ include "drupal/forbidden_url_d7.vcl";
 ## --------------------------------------------------------------------
 
 
-#include "default-conf/dpi7/proxy/proxy.vcl"; 
-include "default-conf/dpi7/esi/dpi7-esi.vcl";
+#include "default-conf/dpi7/proxy/proxy.vcl";
 
+
+#include "default-conf/dpi7/esi/dpi7-esi.vcl";
+
+include "default-conf/dpi7/dpisso/dpisso.vcl";
 
 ## --------------------------------------------------------------------
 ## Below is a copy of the default VCL logic.
@@ -253,7 +254,7 @@ sub vcl_fetch {
 
 	## On gere en fonction des status HTTP retournés
 	if (beresp.status == 404) {
-	#WARNING NEVER pass cokkie unless you will log someone else ;)
+	#WARNING NEVER pass cookie unless you will log someone else ;)
 		unset beresp.http.set-cookie; 
 		set beresp.ttl = 12h; 
 		return(deliver);
@@ -282,7 +283,7 @@ sub vcl_fetch {
 	## gestion des cookies (pages spécifiques).
 	# on renvoit les cookies sur les pages d'authentification et de logout .
 	# si autre page d'aut il faut la mettre ici ... pour le reste le visiteur a pas besoin de recevoir les cookies en retour ...il les a dans son client
-	# @todo: attention poll
+	#@todo: attention poll
 	#@todo: esi ...
     #@todo: d'apres mooi pas besoin renvoyer cookies pour dpicache_Esi_profile_info.php
     #if (req.url ~ "^/user"  || req.url ~ "^/logout"){
@@ -335,6 +336,11 @@ sub vcl_deliver {
 
     return (deliver);
 }
+
+
+
+
+
 
 
 ## --------------------------------------------------------------------

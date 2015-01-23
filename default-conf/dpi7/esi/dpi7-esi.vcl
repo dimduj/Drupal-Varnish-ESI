@@ -4,8 +4,6 @@
 ## When starting a new request check if we need to hook through role system ##
 sub vcl_recv {
 
-
-
   # Security sanity check
   # Check that the esi_get_user_infos is not asked by end-user as it's a pure internal call
   if (req.url == "/dpicache_esi_profile_info.php" && req.restarts == 0) {
@@ -18,7 +16,7 @@ sub vcl_recv {
   
   }
   
-  
+
   
   # End Security Check
 
@@ -148,6 +146,7 @@ sub vcl_fetch {
   #  return (hit_for_pass);
   #}
   elseif (req.url ~ "^/esi.*"){
+    //@todo: check si il faut les lgines en dessous
     return (deliver);
     
     if( req.http.X-Dpicache-granularity && beresp.http.Cache-Control ~ "private" ) {
@@ -173,6 +172,7 @@ sub vcl_deliver {
   set resp.http.X-Dpicache-username  = req.http.X-Dpicache-username;
   set resp.http.X-Dpicache-granularity  = req.http.X-Dpicache-granularity;
   set resp.http.X-COCO  = "rrr";
+  set resp.http.X-COCO3  = "rrr";
   set resp.http.X-Dpicache-graffffy=req.http.X-Dpicache-graffffy;
   set resp.http.X-Dpicache-flute=req.http.X-Dpicache-flute;
 

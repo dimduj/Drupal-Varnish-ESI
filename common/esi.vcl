@@ -9,7 +9,8 @@ sub vcl_recv {
 
 sub vcl_fetch {
 	# handle ESI 
-    
+
+    //todo: check if we should allow ESI here (what about static ?)
 	if (! req.url ~ "^[^?]*\.(png|jpg|gif|css|js|swf|flv|ico|xml|txt|pdf|doc|woff|eot|mp[34])(\?.*)?$") {
 		set beresp.do_esi = true;
 	}

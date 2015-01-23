@@ -2,7 +2,7 @@ probe actsprobe
 {
         .request =
          "GET /robots.txt HTTP/1.1"
-         "Host: www.vlan.be"
+         "Host: site1-stage.dpi247.dev"
          "Connection: close";
         .timeout = 0.8s;
         .interval = 5s;
@@ -12,7 +12,7 @@ probe actsprobe
 
 backend bapaacts01
 {
-        .host = "bapaacts01.rossel.be";
+        .host = "site1-stage.dpi247.dev";
         .port = "8083";
         .saintmode_threshold = 0;
         .first_byte_timeout = 120s;
@@ -23,7 +23,7 @@ backend bapaacts01
 
 backend bapaacts02
 {
-        .host = "bapaacts02.rossel.be";
+        .host = "site2-stage.dpi247.dev";
         .port = "8083";
         .saintmode_threshold = 0;
         .first_byte_timeout = 120s;

@@ -9,7 +9,7 @@ sub vcl_error {
 	if (obj.status == 503 && req.restarts < 4) {
 		std.log("vcl_error(): Status 503 - restart");
 		#restart est une constante => reboucle depuis le départ (passe par le round robin)
-		#c'est varnbish qui gere l'incrmentation de req.restarts
+		#c'est varnish qui gere l'incrmentation de req.restarts
 		return (restart);
 	}
 }
