@@ -5,6 +5,7 @@ probe actsprobe
          "GET /robots.txt HTTP/1.1"
          "Host: dpi7.dpi247.dev" # host transmis à un host apache lors requet probing pas le host interogé
          "Connection: close";
+
         .timeout = 0.8s;
         .interval = 5s;
         .window = 30;
@@ -15,7 +16,7 @@ probe actsprobe
 backend dpiserver01
 {
         .host = "site1.dpi247.dev";
-        .port = "80";
+        .port = "8080";
         .saintmode_threshold = 0;
         .first_byte_timeout = 120s;
         .between_bytes_timeout = 120s;
@@ -29,7 +30,7 @@ backend dpiserver01
 backend dpiserver02
 {
         .host = "site2.dpi247.dev";
-        .port = "80";
+        .port = "8080";
         .saintmode_threshold = 0;
         .first_byte_timeout = 120s;
         .between_bytes_timeout = 120s;

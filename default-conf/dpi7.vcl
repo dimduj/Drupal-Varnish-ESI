@@ -140,9 +140,9 @@ include "drupal/forbidden_url_d7.vcl";
 #include "default-conf/dpi7/proxy/proxy.vcl";
 
 
-#include "default-conf/dpi7/esi/dpi7-esi.vcl";
+include "default-conf/dpi7/esi/dpi7-esi.vcl";
 
-include "default-conf/dpi7/dpisso/dpisso.vcl";
+#include "default-conf/dpi7/dpisso/dpisso.vcl";
 
 ## --------------------------------------------------------------------
 ## Below is a copy of the default VCL logic.
@@ -287,7 +287,7 @@ sub vcl_fetch {
 	#@todo: esi ...
     #@todo: d'apres mooi pas besoin renvoyer cookies pour dpicache_Esi_profile_info.php
     #if (req.url ~ "^/user"  || req.url ~ "^/logout"){
-    if (req.url ~ "^/user"  || req.url ~ "^/logout"|| req.url ~ "^/dpicache_esi_profile_info.php"){
+    if (req.url ~ "^/user"  || req.url ~ "^/logout"|| req.url ~ "^/dpicache_esi_profile_info.php" || req.url ~ "^/dpisso-loginmanager.php"){
     # Ici, on laisse les cookies 
     } else {
     

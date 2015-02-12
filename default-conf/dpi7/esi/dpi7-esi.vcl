@@ -5,7 +5,7 @@
 sub vcl_recv {
 
   # Security sanity check
-  # Check that the esi_get_user_infos is not asked by end-user as it's a pure internal call
+  # Check that the esi_get_user_infos is not asked by end-user as it is a pure internal call
   if (req.url == "/dpicache_esi_profile_info.php" && req.restarts == 0) {
     error 401 "Direct call to user info is denied"; 
   }
@@ -24,7 +24,8 @@ sub vcl_recv {
 
   # The URL structure of ESI blocks identifies which are per-user or per-role.
   # e.g. /esi/block/garland:left:foo:bar/node%2F1/CACHE%3DUSER
-  # Add a header to show if we're using a particular cache strategy.
+  # Add a header to show if we are using a particular cache strategy.
+
   if ((req.url ~ "^/esi/block" ) || (req.url ~ "^/esi/panels_pane") || (req.url ~ "^/esi/dpicache" )) {
     if(req.restarts==0){
       set req.http.X-Dpicache-use_esi=1;
@@ -43,7 +44,7 @@ sub vcl_recv {
       # look for a cache instruction. This should be the final argument to the URL
       # and should have the value 'USER' or 'ROLE'.
       # We check for role datas
-      set req.http.X-Dpicache-flute="coco";
+      set req.http.X-Dpi-cache-flute="coco";
 
       if ( req.url ~ "^.*/CACHE%3D[^/]*$" ) {
         set req.http.X-Dpicache-graffffy="ggg";
@@ -101,13 +102,13 @@ sub vcl_hash {
       # Adds the Sessid / sessvalue
       hash_data(regsub( req.http.Cookie, "^.*?SESS(.{32})=([^;]*);*.*$", "\1:\2" ));
     }
-    if( req.http.Cookie ~ "USESS" ) {
+    if( req.http.Cookie ~ "ESI_USER" ) {
       # Adds the Sessid / sessvalue
-      hash_data(regsub( req.http.Cookie, "^.*?USESS(.{32})=([^;]*);*.*$", "U:\1:\2" ));
+      hash_data(regsub( req.http.Cookie, "^.*?ESI_USER_SESS(.{32})=([^;]*);*.*$", "U:\1:\2" ));
     }
-    if( req.http.Cookie ~ "RSESS" ) {
+    if( req.http.Cookie ~ "ESI_ROLE" ) {
       # Adds the Sessid / sessvalue
-      hash_data(regsub( req.http.Cookie, "^.*?RSESS(.{32})=([^;]*);*.*$", "R:\1:\2" ));
+      hash_data(regsub( req.http.Cookie, "^.*?ESI_ROLE_SESS(.{32})=([^;]*);*.*$", "R:\1:\2" ));
     }
     return(hash);
   }
