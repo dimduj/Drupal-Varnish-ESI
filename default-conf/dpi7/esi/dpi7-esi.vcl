@@ -27,6 +27,7 @@ sub vcl_recv {
   # Add a header to show if we are using a particular cache strategy.
 
   if ((req.url ~ "^/esi/block" ) || (req.url ~ "^/esi/panels_pane") || (req.url ~ "^/esi/dpicache" )) {
+
     if(req.restarts==0){
       set req.http.X-Dpicache-use_esi=1;
       
@@ -78,7 +79,7 @@ sub vcl_recv {
         set req.url = req.url+"?dpicache-roles="+req.http.X-Dpicache-roles+"&page=1";
         set req.http.X-Original-URL = req.url;
       }
-      
+
     } 
   }
 
@@ -93,6 +94,9 @@ sub vcl_recv {
 
 # Create the hash for the user_info
 sub vcl_hash {
+      hash_data(req.url );
+    std.syslog(1,"hash AMARO00000000000000000000000000000000000000000000000000000 req.url: ");
+
   if (req.url ~"^/dpicache_esi_profile_info.php") {
     # Default hash
     hash_data(req.url);
@@ -119,9 +123,6 @@ sub vcl_hash {
     
     #if username = role name => we ensure unicity of the hash
     hash_data(req.http.X-Dpicache-granularity);
-    //hash_data(req.url );
-    
-    
     
     
   }
@@ -148,6 +149,15 @@ sub vcl_fetch {
   #}
   elseif (req.url ~ "^/esi.*"){
     //@todo: check si il faut les lgines en dessous
+
+     unset beresp.http.expires;
+
+     /* Set the clients TTL on this object */
+     set beresp.http.cache-control = "max-age=900";
+
+     /* Set how long Varnish will keep it */
+     set beresp.ttl = 1w;
+
     return (deliver);
     
     if( req.http.X-Dpicache-granularity && beresp.http.Cache-Control ~ "private" ) {
@@ -170,6 +180,11 @@ sub vcl_deliver {
      unset req.http.X-Original-URL;
      return (restart);
   }
+
+  //@todo: should i remove thises headers ?
+   //unset resp.http.Etag;
+   //unset resp.http.Expires;
+
   set resp.http.X-Dpicache-username  = req.http.X-Dpicache-username;
   set resp.http.X-Dpicache-granularity  = req.http.X-Dpicache-granularity;
   set resp.http.X-COCO  = "rrr";

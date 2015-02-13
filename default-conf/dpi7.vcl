@@ -71,11 +71,11 @@ include "common/redirect.vcl";
 ## Restart on 503 - 
 # si on recoit une 503 on reessaye trois fois de plus (nbre de round robin +1) avant de reelement renvoyer 503 au client
 #@todo: check compatibility with drupal ESI per ROLE/USER/... since ESI aslo do restart ? check)
-include "common/error_restart.vcl";
+#include "common/error_restart.vcl";
 
 ## repair weird request format "GET http://host/path"
 #@todo: Remove temporary cause issue with ESI ? => seems not ... :/
-#include "common/normalize_http.vcl";
+include "common/normalize_http.vcl";
 
 ## allow "HTTPS:" header from SSL proxies only
 include "common/http_https.vcl";
@@ -287,7 +287,7 @@ sub vcl_fetch {
 	#@todo: esi ...
     #@todo: d'apres mooi pas besoin renvoyer cookies pour dpicache_Esi_profile_info.php
     #if (req.url ~ "^/user"  || req.url ~ "^/logout"){
-    if (req.url ~ "^/user"  || req.url ~ "^/logout"|| req.url ~ "^/dpicache_esi_profile_info.php" || req.url ~ "^/dpisso-loginmanager.php"){
+    if (req.url ~ "^/user"  || req.url ~ "^/logout"||  req.url ~ "^/dpisso-loginmanager.php"){
     # Ici, on laisse les cookies 
     } else {
     
