@@ -16,7 +16,7 @@ probe actsprobe
 backend dpiserver01
 {
         .host = "site1.dpi247.dev";
-        .port = "8080";
+        .port = "80";
         .saintmode_threshold = 0;
         .first_byte_timeout = 120s;
         .between_bytes_timeout = 120s;
@@ -30,7 +30,7 @@ backend dpiserver01
 backend dpiserver02
 {
         .host = "site2.dpi247.dev";
-        .port = "8080";
+        .port = "80";
         .saintmode_threshold = 0;
         .first_byte_timeout = 120s;
         .between_bytes_timeout = 120s;
