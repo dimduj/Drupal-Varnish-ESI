@@ -22,19 +22,23 @@ sub vcl_hash {
     	  #ex2: &page=1=>?page=1
 		#  set req.http.X-Sanitized-URL = regsub(req.http.X-Sanitized-URL,"&","?");
 		#}
-		
+		                std.syslog(0,"hash sanitized-url"+req.http.X-Sanitized-URL);
 		hash_data(req.http.X-Sanitized-URL);
 		
 		set req.http.X-CacheHash = req.http.X-Sanitized-URL;
 	  } else {
 		# on est dans le cas des URLs de la liste ci dessus, on cache avec tous les parametres. 
 		hash_data(req.url);
+                std.syslog(0,"hash req-url"+req.url);
+
 		set req.http.X-CacheHash = req.url;
 	  }
 
 
 	  #@todo: rename or remove req.http.X-CacheHash . It appear to be useless
-	  hash_data(req.http.host);
+	                std.syslog(0,"hash req.host"+req.http.host);
+  
+	hash_data(req.http.host);
 	  
 	  #@todo: dont need this anymore since we do that on deliver of dpi7.vcl
 	  //set req.http.X-CacheHash = req.http.X-CacheHash + req.http.host;

@@ -96,21 +96,22 @@ sub vcl_recv {
 sub vcl_hash {
 
   if (req.url ~"^/dpicache_esi_profile_info.php") {
-    # Default hash
+    # Default ha
+sh
+    
+		hash_data(req.url);
+    hash_data(req.http.host);
     # Per User / Session
     if( req.http.Cookie ~ "SESS" ) {
       # Adds the Sessid / sessvalue
-                                std.syslog(0,"sessionID / value sess"+regsub( req.http.Cookie, "^.*?SESS(.{32})=([^;]*);*.*$", "\1:\2" ) );
       hash_data(regsub( req.http.Cookie, "^.*?SESS(.{32})=([^;]*);*.*$", "\1:\2" ));
     }
     if( req.http.Cookie ~ "ESI_USER" ) {
       # Adds the Sessid / sessvalue
-	std.syslog(0,"sessid /sessvalue user:"+regsub( req.http.Cookie, "^.*?ESI_USER_SESS(.{32})=([^;]*);*.*$", "U:\1:\2" ));
       hash_data(regsub( req.http.Cookie, "^.*?ESI_USER_SESS(.{32})=([^;]*);*.*$", "U:\1:\2" ));
     }
     if( req.http.Cookie ~ "ESI_ROLE" ) {
       # Adds the Sessid / sessvalue
-      std.syslog(0,"sessid / sessvalue role"+regsub(req.http.Cookie, "^.*?ESI_ROLE_SESS(.{32})=([^;]*);*.*$", "R:\1:\2" ));
       hash_data(regsub( req.http.Cookie, "^.*?ESI_ROLE_SESS(.{32})=([^;]*);*.*$", "R:\1:\2" ));
     }
   }
@@ -120,7 +121,6 @@ sub vcl_hash {
     ## Hash the cache mode
     
     #if username = role name => we ensure unicity of the hash
-    std.syslog(0,"dpi granularity"+req.http.X-Dpicache-granularity);
     hash_data(req.http.X-Dpicache-granularity);
     
     

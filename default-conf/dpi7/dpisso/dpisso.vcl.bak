@@ -34,7 +34,7 @@ backend accessmanager
 sub vcl_recv {
 	if (req.url !~ "^[^?]*\.(png|jpg|gif|css|js|swf|flv|ico|xml|txt|pdf|doc|woff|eot|mp[34])(\?.*)?$") {
 		if(req.url~"/dpisso-loginmanager.php"){
-			//std.syslog(0,"operation login / logout");
+			std.syslog(0,"operation login / logout");
 			//dont cash login and logout
 			return(pipe);
 		}
@@ -61,31 +61,30 @@ sub vcl_recv {
 		std.syslog(0,"=============================================");
 		std.syslog(0,"restart: "+req.restarts);
 		std.syslog(0,"requrl: "+req.url);
-		//std.syslog(0,"http Cookie recv:"+req.http.Cookie);
+		std.syslog(0,"http Cookie recv:"+req.http.Cookie);
 		
-		//std.syslog(0,"req.http.X-dpisso-is_connected"+req.http.X-dpisso-is_connected);
-		//std.syslog(0,"req.http.X-dpisso_loginToken"+req.http.X-dpisso_loginToken);
-		 //  std.syslog(0,"req-AM-is-freemium "+req.http.AM-is-freemium);
+		std.syslog(0,"req.http.X-dpisso-is_connected"+req.http.X-dpisso-is_connected);
+		std.syslog(0,"req.http.X-dpisso_loginToken"+req.http.X-dpisso_loginToken);
 		
 		  //First we need to get the loginId for the loginToken. If we are not loggedin we need to login first...
 		 if(  req.restarts==0  && req.http.X-dpisso-is_connected!="1" && req.http.X-dpisso_loginToken){
   			set req.http.X-Original-URL = req.url;
 			set req.url = "/dpisso-loginmanager.php?operation=connect?loginToken="+req.http.X-dpisso_loginToken+"&returnPage="+req.http.X-Original-URL;
-			//std.syslog(0,"login into Drupal => call to "+req.url);
+			std.syslog(0,"login into Drupal => call to "+req.url);
 			return(pipe);
 			
 		  }else if(  req.restarts==0  && req.http.X-dpisso-is_connected=="1" && req.http.X-dpisso_loginToken){
-			 //std.syslog(0,"session drupal ok => getloginId for logintoken");
+			 std.syslog(0,"session drupal ok => getloginId for logintoken");
 			   set req.http.X-Original-URL = req.url;
 			   set req.url="/services/getLoginId?loginToken="+regsub( req.http.Cookie, "^.*?dpisso_loginToken=([^;]*);*.*$","\1" );
-			   //std.syslog(0,"LM requrl"+req.url);
+			   std.syslog(0,"LM requrl"+req.url);
 
 			   set req.backend = loginmanager;
 			   return (lookup);
 
 		  }
 		  else if(!req.http.AM-is-freemium ){
-			//std.syslog(0,"getAM");
+			std.syslog(0,"getAM");
 			set req.http.X-dpisso_unitId=regsub( req.http.Cookie, "^.*?dpisso_unitId=([^;]*);*.*$","\1" );
 			set req.http.X-dpisso_cookieId=regsub( req.http.Cookie, "^.*?monsitedpi7=([^;]*);*.*$","\1" );
 			set req.http.X-Original-URL = req.url;
@@ -98,7 +97,7 @@ sub vcl_recv {
 			else{
 				set req.url="/dpiSSO_AM_getServicesForLoginId?unitId="+req.http.X-dpisso-unitId+"&cookieId="+req.http.X-dpisso_cookieId+"&url="+req.http.X-Original-URL;
 			}
-			//std.syslog(0,"AM requrl"+req.url);
+			std.syslog(0,"AM requrl"+req.url);
 			if(req.url !~ "/esi/"){
 					return(pass);
 				}
@@ -111,11 +110,13 @@ sub vcl_recv {
 
 sub vcl_hash {
 	if (req.url !~ "^[^?]*\.(png|jpg|gif|css|js|swf|flv|ico|xml|txt|pdf|doc|woff|eot|mp[34])(\?.*)?$") {
+		//add req.url in hash
+		std.syslog(0,"hash req.url: "+ req.url);
+		hash_data(req.url);
 		//@todo: define TTL
 		if (req.backend == loginmanager) {
 			std.syslog(0,"hash backend loginmanager"+req.http.X-dpisso_loginToken);
 			hash_data(req.http.X-dpisso_loginToken);
-			//return hash because we want to get url granularity for caching loginId (cf hashing strategy)
 			return(hash);
 		  }
 
@@ -125,17 +126,15 @@ sub vcl_hash {
 			std.syslog(0,"hash backend AM"+req.http.X-dpisso_loginId);
 			if(req.http.X-dpisso_loginId){
 				hash_data(req.http.X-dpisso_loginId);
-				return(hash);
 			}
 			else{
 				hash_data(req.http.X-dpisso_cookieId);
-				return(hash);
 			}
 		  }
 		  else{
 			std.syslog(0,"has normal => freemium:"+req.http.AM-is-freemium);
 			  hash_data("freemium:"+req.http.AM-is-freemium);
-		
+			  return(hash);
 		  }
 	}
 }
@@ -150,7 +149,7 @@ sub vcl_deliver {
 				   unset req.http.X-Original-URL;
 				   set req.http.X-dpisso_loginId=resp.http.Lm-Loginid;
 				   set req.backend = dpiserver01;
-				   //std.syslog(0,"loginManagerDeliver: "+req.http.X-dpisso_loginId);
+				   std.syslog(0,"loginManagerDeliver: "+req.http.X-dpisso_loginId);
 				   return (restart);
 		}
 
@@ -159,7 +158,7 @@ sub vcl_deliver {
 						 unset req.http.X-Original-URL;
 						 set req.backend = dpiserver01;
 						 set req.http.AM-is-freemium=resp.http.AM-is-freemium;
-						 //std.syslog(0,"accessManagerDeliver: "+req.http.AM-is-freemium);
+						 std.syslog(0,"accessManagerDeliver: "+req.http.AM-is-freemium);
 						 return (restart);
 		}
 		
@@ -171,9 +170,9 @@ sub vcl_deliver {
 			//return(deliver);
 		//}
 		else{
-			//std.syslog(0,"normal deliver:"+req.url);
-			//std.syslog(0,"header AM:"+req.http.AM-is-freemium);
-			
+			std.syslog(0,"normal deliver:"+req.url);
+			std.syslog(0,"header AM:"+req.http.AM-is-freemium);
+			return(deliver);
 		}
 	}
 } 
