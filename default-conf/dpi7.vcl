@@ -287,7 +287,7 @@ sub vcl_fetch {
 	#@todo: esi ...
     #@todo: d'apres mooi pas besoin renvoyer cookies pour dpicache_Esi_profile_info.php
     #if (req.url ~ "^/user"  || req.url ~ "^/logout"){
-    if (req.url ~ "^/user"  || req.url ~ "^/logout"||  req.url ~ "^/dpisso-loginmanager.php"){
+    if (req.url ~ "^/user"  || req.url ~ "^/logout" ||  req.url ~ "^/dpisso-loginmanager.php" ||  req.url ~ "^/dpicache_esi_profile_info.php"){
     # Ici, on laisse les cookies 
     } else {
     
