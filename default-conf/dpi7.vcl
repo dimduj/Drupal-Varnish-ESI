@@ -142,7 +142,7 @@ include "drupal/forbidden_url_d7.vcl";
 
 include "default-conf/dpi7/esi/dpi7-esi.vcl";
 
-#include "default-conf/dpi7/dpisso/dpisso.vcl";
+include "default-conf/dpi7/dpisso/dpisso.vcl";
 
 ## --------------------------------------------------------------------
 ## Below is a copy of the default VCL logic.
